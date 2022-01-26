@@ -1,16 +1,17 @@
 /**
- * TODO: Add your file header
- * Name:
+ * Name: Morales, Kyle
  * Email:
- * Sources used: Put "None" if you did not have any external help
+ * Sources used: zybooks, piazza answers, PA documentation
  * 
- * 2-4 sentence file description here
+ * Description: Implementation of MyLinkedList<E>
  */
 
 import java.util.AbstractList;
 
 /** 
- * TODO: Add class header here 
+ * MyLinkedList<E> is an extension of te AbstractList<E> class. 
+ * It is a doubly linked list with two sentinel nodes for the head
+ * and tail of the list
  */
 
 public class MyLinkedList<E> extends AbstractList<E> {
@@ -90,48 +91,192 @@ public class MyLinkedList<E> extends AbstractList<E> {
 	//  Implementation of the MyLinkedList Class
 	/** Only 0-argument constructor is defined */
 	public MyLinkedList() {
-		/* Add your implementation here */
-		// TODO
+		size = 0;
+		head = new Node(null);
+		tail = new Node(null);
+		head.setNext(tail);
+		tail.setPrev(head);
 	}
 
+	/**
+	 * Returns the size of the list
+	 * 
+	 * @return size of the list
+	 */
 	@Override
 	public int size() {
-		// need to implement the size method
-		return 0; // TODO
+		return this.size;
 	}
 
+	/**
+	 * Returns the element of node at the specified position node 
+	 * 
+	 * @param index the position index of the node
+	 * @return the element of the node
+	 * @throws IndexOutOfBoundsException for indices outside of list
+	 */
 	@Override
-	public E get(int index) {
-		return (E) null;  // TODO
+	public E get(int index) throws IndexOutOfBoundsException {
+		Node curr = head;
+		if(index < 0 || index >= this.size()) {
+			throw new IndexOutOfBoundsException();
+		}
+		for(int i = 0; i <= index; i++) {
+			curr = curr.getNext();
+		}
+		return curr.getElement();
 	}
 
+	/**
+	 * Inserts element at specified position index
+	 * 
+	 * @param index the specific index
+	 * @param data the data to be inserted
+	 * @throws NullPointerException for null data entry
+	 * @throws IndexOutOfBoundsException for indices outside of list 
+	 */
 	@Override
-	public void add(int index, E data) {
-		/* Add your implementation here */
-		// TODO
+	public void add(int index, E data) throws NullPointerException, 
+		IndexOutOfBoundsException {
+		Node curr = head;
+		Node newNode = new Node(data);
+		if(data == null) {
+			throw new NullPointerException();
+		}
+		if(index < 0 || index > this.size()) {
+			throw new IndexOutOfBoundsException();
+		}
+		if(this.size() == 0) { //when list is empty
+			this.head.setNext(newNode);
+			this.tail.setPrev(newNode);
+			newNode.setPrev(this.head);
+			newNode.setNext(this.tail);
+		}
+		else {
+			for(int i = 0; i < index; i++) {
+				curr = curr.getNext();
+			}
+			Node succ = curr.getNext();
+			newNode.setNext(curr.getNext());
+			newNode.setPrev(curr);
+			curr.setNext(newNode);
+			succ.setPrev(newNode);
+		}
+		size++;
 	}
 
-	public boolean add(E data) {
-		return true; // TODO
+	/**
+	 * Appends data to a list
+	 * 
+	 * @param data data to be appended to the list
+	 * @return true, due to the abstract method definition
+	 * @throws NullPointerException
+	 */
+	public boolean add(E data) throws NullPointerException {
+		Node newNode = new Node(data);
+		if(data == null) {
+			throw new NullPointerException();
+		}
+		if(this.size() == 0) { //when list is empty
+			this.head.setNext(newNode);
+			this.tail.setPrev(newNode);
+			newNode.setPrev(this.head);
+			newNode.setNext(this.tail);
+		}
+		else {
+			this.tail.getPrev().setNext(newNode);
+			newNode.setPrev(this.tail.prev);
+			this.tail.setPrev(newNode);
+		}
+		size++;
+		return true;
 	}
 
-	public E set(int index, E data) {
-		return (E) null; // TODO
+	/**
+	 * Set the element for the node at index to data and return the previously 
+	 * stored node
+	 * 
+	 * @param index the position index of the node
+	 * @param data the data overwritting the specified node
+	 * @return the previously stored contents of the overwritten node
+	 * @throws IndexOutOfBoundsException for indices outside of list
+	 * @throws NullPointerException for null data entry
+	 */
+	public E set(int index, E data) throws IndexOutOfBoundsException, NullPointerException {
+		Node curr = head;
+		E val;
+		if(index < 0 || index >= this.size()) {
+			throw new IndexOutOfBoundsException();
+		}
+		if(data == null) {
+			throw new NullPointerException();
+		}
+		for(int i = 0; i <= index; i++) {
+			curr = curr.getNext();
+		}
+		val = curr.getElement();
+		curr.setElement(data);
+		return val;
 	}
 
-	public E remove(int index) {
-		return (E) null; // TODO
+	/**
+	 * Remove the node from the position index and return the removed node data
+	 * 
+	 * @param index the index of the to be removed node
+	 * @return the data within the removed node
+	 * @throws IndexOutBoundException 
+	 */
+	public E remove(int index) throws IndexOutOfBoundsException {
+		Node curr = head;
+		if(index < 0 || index >= this.size()) {
+			throw new IndexOutOfBoundsException();
+		}
+		for(int i = 0; i <= index; i++) {
+			curr = curr.getNext();
+		}
+		curr.prev.setNext(curr.getNext());
+		curr.getNext().setPrev(curr.prev);
+		size--;
+		return curr.getElement();
 	}
 
+	/**
+	 * clears a list
+	 */
 	public void clear() {
-		/* Add your implementation here */
+		size = 0;
+		this.head.setNext(tail);
+		this.tail.setPrev(head);
 	}
-
+	/**
+	 * determines whether the list is empty or not
+	 * @return boolean denoting the status of list emptiness
+	 */
 	public boolean isEmpty() {
-		return true;  // TODO
+		if(this.head.getNext() == this.tail && this.tail.getPrev() == this.head) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
-
-	protected Node getNth(int index) {
-		return (Node) null;  // TODO
+	/**
+	 * A helper method that returns the Node at a specific index.
+	 * 
+	 * @param index index of the the node
+	 * @return the node in question
+	 * @throws IndexOutOfBoundsException
+	 */
+	protected Node getNth(int index) throws IndexOutOfBoundsException{
+		Node curr = this.head;
+		if(index < 0 || index >= this.size()) {
+			throw new IndexOutOfBoundsException();
+		}
+		else {
+			for(int i = 0; i <= index; i++) {
+				curr = curr.getNext();
+			}
+		}
+		return curr;
 	}
 }
